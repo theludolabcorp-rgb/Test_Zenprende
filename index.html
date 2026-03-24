@@ -50,6 +50,42 @@
         }
         .spiral-dark { animation: spinSpiral 12s linear infinite; }
         .spiral-light { animation: spinSpiral 12s linear infinite; }
+
+        /* Efecto de puntos a pantalla completa al avanzar de pregunta */
+        .fullscreen-points {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeInOut 1.1s ease-in-out forwards;
+        }
+        .fullscreen-points-text {
+            font-size: 7rem;
+            font-weight: 900;
+            color: #00A8A8;
+            text-shadow: 0 10px 25px rgba(0, 168, 168, 0.5);
+            animation: zoomBounceFade 1.1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @keyframes zoomBounceFade {
+            0% { transform: scale(0.3) translateY(50px); opacity: 0; }
+            25% { transform: scale(1.1) translateY(0); opacity: 1; }
+            75% { transform: scale(1) translateY(0); opacity: 1; }
+            100% { transform: scale(1.6) translateY(-100px); opacity: 0; }
+        }
     </style>
 </head>
 <body class="bg-white text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
@@ -87,33 +123,23 @@
                 </svg>
             </div>
             
-            <!-- Zona blanca para textos y logos -->
-            <div class="bg-white pb-8 md:pb-10 px-4 text-center">
-                <p class="text-[10px] md:text-sm text-zenTeal font-semibold mb-3">Proyecto apoyado con recursos del FIDEM</p>
-                <!-- Placeholders de logos como en el diseño -->
-                <div class="flex justify-center items-center gap-3 md:gap-6 opacity-60">
-                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded text-[8px] md:text-xs flex items-center justify-center font-bold">CCDER</div>
-                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
-                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
-                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
-                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
-                </div>
+            <!-- Zona blanca para la imagen de logos de apoyo -->
+            <div class="bg-white pb-8 md:pb-10 px-4 flex justify-center items-center">
+                <img src="https://iili.io/q6OiS9f.png" alt="Proyecto apoyado con recursos del FIDEM" class="h-10 md:h-14 object-contain max-w-full">
             </div>
         </footer>
 
         <!-- Modal de Instrucciones (Oculto por defecto) -->
         <div id="instructions-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center hidden">
-            <div class="bg-white rounded-3xl p-8 w-11/12 max-w-lg shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
-                <h3 class="text-2xl md:text-3xl font-bold text-zenDark mb-6 text-center">Instrucciones</h3>
-                <p class="text-base md:text-lg text-gray-600 mb-6 text-justify">
-                    Bienvenido a ZenPrende. A continuación se te presentarán 8 situaciones comunes en la vida de un líder o emprendedor.
+            <div class="bg-white rounded-3xl p-8 w-11/12 max-w-lg shadow-2xl transform scale-95 transition-transform duration-300 relative" id="modal-content">
+                <!-- Botón X para cerrar -->
+                <button onclick="closeInstructions()" class="absolute top-4 right-4 text-gray-400 hover:text-zenTeal transition p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
+                </button>
+                <h3 class="text-2xl md:text-3xl font-bold text-zenDark mb-6 text-center mt-2">Instrucciones</h3>
+                <p class="text-base md:text-lg text-gray-600 mb-8 text-center font-medium">
+                    Responde con total honestidad. Selecciona la opción que mejor describa tu realidad en las últimas 4 semanas.
                 </p>
-                <ul class="text-base md:text-lg text-gray-600 mb-8 list-disc pl-6 space-y-3">
-                    <li>Lee cuidadosamente cada pregunta.</li>
-                    <li>Selecciona la opción con la que más te identifiques actualmente.</li>
-                    <li>No hay respuestas correctas o incorrectas.</li>
-                    <li>Al finalizar, recibirás un diagnóstico sobre tu bienestar emocional.</li>
-                </ul>
                 <button onclick="startTest()" class="w-full bg-zenTeal text-white font-bold text-lg md:text-xl py-4 rounded-full shadow-md hover:bg-opacity-90 transition transform hover:scale-105 active:scale-95">
                     ¡Comenzar Test!
                 </button>
@@ -181,97 +207,97 @@
                 id: 1,
                 title: "Nivel de energía al despertar",
                 options: [
-                    { text: "a) Me siento descansado y listo para los retos.", points: 3 },
-                    { text: "b) Me toma un café y un rato 'arrancar', pero luego funciono.", points: 2 },
-                    { text: "c) Siento que no dormí nada; el cansancio es físico y mental desde el minuto uno.", points: 1 }
+                    { text: "A. Me siento descansado y listo para los retos.", points: 0 },
+                    { text: "B. Me toma un café y un rato \"arrancar\", pero luego funciono.", points: 1 },
+                    { text: "C. Siento que no dormí nada; el cansancio es físico y mental desde el minuto uno.", points: 2 }
                 ]
             },
             {
                 id: 2,
                 title: "Relación con clientes y equipo",
                 options: [
-                    { text: "a) Disfruto la interacción y busco soluciones con empatía.", points: 3 },
-                    { text: "b) A veces me saturan, pero logro mantener la profesionalidad.", points: 2 },
-                    { text: "c) Me siento irritable; cualquier pregunta o error ajeno me genera un rechazo profundo.", points: 1 }
+                    { text: "A. Disfruto la interacción y busco soluciones con empatía.", points: 0 },
+                    { text: "B. A veces me saturan, pero logro mantener la profesionalidad.", points: 1 },
+                    { text: "C. Me siento irritable; cualquier pregunta o error ajeno me genera un rechazo profundo.", points: 2 }
                 ]
             },
             {
                 id: 3,
-                title: "Manejo del estrés ante imprevistos",
+                title: "Capacidad de enfoque y decisión",
                 options: [
-                    { text: "a) Mantengo la calma, analizo y actúo de forma estructurada.", points: 3 },
-                    { text: "b) Me genera ansiedad momentánea, pero logro resolverlo sobre la marcha.", points: 2 },
-                    { text: "c) Me paralizo o reacciono de forma impulsiva y frustrada.", points: 1 }
+                    { text: "A. Tengo claridad sobre mis prioridades estratégicas.", points: 0 },
+                    { text: "B. Me distraigo con facilidad, pero termino lo importante.", points: 1 },
+                    { text: "C. Siento \"niebla mental\"; postergo decisiones simples por horas o días.", points: 2 }
                 ]
             },
             {
                 id: 4,
-                title: "Desconexión laboral (Fin de semana/Noches)",
+                title: "Manifestaciones físicas del estrés",
                 options: [
-                    { text: "a) Apago el modo trabajo y disfruto mi tiempo personal plenamente.", points: 3 },
-                    { text: "b) Intento desconectar, pero reviso correos o mensajes esporádicamente.", points: 2 },
-                    { text: "c) Mi mente nunca para; sigo resolviendo problemas de la empresa en mi tiempo libre.", points: 1 }
+                    { text: "A. Mi salud está estable y duermo bien.", points: 0 },
+                    { text: "B. Dolores de espalda o cuello ocasionales por la tensión.", points: 1 },
+                    { text: "C. Dolores de cabeza constantes, insomnio o problemas digestivos recurrentes.", points: 2 }
                 ]
             },
             {
                 id: 5,
-                title: "Toma de decisiones importantes",
+                title: "Sentido de logro y satisfacción",
                 options: [
-                    { text: "a) Decido con claridad y confío en mi criterio y experiencia.", points: 3 },
-                    { text: "b) Dudo un poco y busco validación constante, pero termino decidiendo.", points: 2 },
-                    { text: "c) Postergó las decisiones por miedo a equivocarme o sentir que todo depende de mí.", points: 1 }
+                    { text: "A. Me emociono cuando alcanzamos una meta o cerramos una venta.", points: 0 },
+                    { text: "B. Siento alivio al terminar las cosas, más que alegría.", points: 1 },
+                    { text: "C. Los éxitos me dan igual; solo veo la siguiente montaña de problemas.", points: 2 }
                 ]
             },
             {
                 id: 6,
-                title: "Reacción ante un fracaso o pérdida en el negocio",
+                title: "Desconexión digital y personal",
                 options: [
-                    { text: "a) Lo veo como un aprendizaje necesario y pivoto la estrategia.", points: 3 },
-                    { text: "b) Me desmotiva por un tiempo, pero eventualmente me recupero.", points: 2 },
-                    { text: "c) Lo tomo como una derrota personal y me hace dudar de mis capacidades.", points: 1 }
+                    { text: "A. Tengo horarios claros para apagar el celular y estar con mi familia/hobbies.", points: 0 },
+                    { text: "B. Intento desconectar, pero reviso el correo \"por si acaso\" antes de dormir.", points: 1 },
+                    { text: "C. No existe frontera; el trabajo invade mis cenas, mis sueños y mis descansos.", points: 2 }
                 ]
             },
             {
                 id: 7,
-                title: "Capacidad de delegar tareas",
+                title: "Tolerancia a la frustración",
                 options: [
-                    { text: "a) Confío en mi equipo y les doy autonomía para ejecutar.", points: 3 },
-                    { text: "b) Delego solo lo operativo, pero micro-gestiono las cosas importantes.", points: 2 },
-                    { text: "c) Hago casi todo yo mismo porque siento que nadie más lo hará igual de bien.", points: 1 }
+                    { text: "A. Entiendo que los errores son parte del proceso de aprendizaje.", points: 0 },
+                    { text: "B. Me frustro, pero me calmo rápido para buscar la salida.", points: 1 },
+                    { text: "C. Exploto o me hundo emocionalmente ante el más mínimo contratiempo.", points: 2 }
                 ]
             },
             {
                 id: 8,
-                title: "Visión a futuro sobre tu emprendimiento",
+                title: "Identidad personal vs. Negocio",
                 options: [
-                    { text: "a) Me entusiasma el crecimiento y tengo metas claras.", points: 3 },
-                    { text: "b) Veo el futuro con algo de incertidumbre, voy día a día.", points: 2 },
-                    { text: "c) Solo pienso en sobrevivir este mes; el futuro me genera angustia.", points: 1 }
+                    { text: "A. Sé que soy mucho más que el éxito o fracaso de mi empresa.", points: 0 },
+                    { text: "B. Me cuesta separar quién soy de lo que facturo.", points: 1 },
+                    { text: "C. Si el negocio va mal, siento que mi valor como persona desaparece.", points: 2 }
                 ]
             }
         ];
 
         const diagnoses = [
             {
-                min: 20, max: 24,
-                title: "Líder Zen (Bienestar Óptimo)",
+                min: 0, max: 5,
+                title: "Riesgo Bajo (Equilibrio Operativo)",
                 color: "text-green-600",
-                description: "¡Felicidades! Tienes un excelente balance emocional. Gestionas tu emprendimiento con inteligencia emocional, lo que te permite ser un líder sostenible. Sigue cultivando tus hábitos de autocuidado.",
-                recommendation: "Recomendación: Comparte tus estrategias de bienestar con tu equipo para fomentar un ambiente de trabajo saludable."
+                description: "Diagnóstico: Tienes un manejo saludable del estrés. Tu resiliencia es alta.",
+                recommendation: "Recomendación: No bajes la guardia. Implementa un \"Día de Desconexión Total\" al mes. Asegúrate de que tus procesos estén documentados para que la empresa no dependa al 100% de tu presencia física."
             },
             {
-                min: 14, max: 19,
-                title: "Emprendedor en la Cuerda Floja",
+                min: 6, max: 11,
+                title: "Riesgo Moderado (Fase de Alerta)",
                 color: "text-yellow-500",
-                description: "Estás logrando mantener a flote el barco, pero estás gastando mucha energía en el proceso. Hay signos de desgaste que, si no se atienden, podrían llevarte al burnout.",
-                recommendation: "Recomendación: Identifica tareas que puedes delegar de inmediato y establece horarios estrictos de desconexión."
+                description: "Diagnóstico: Estás en \"modo supervivencia\". Tu cuerpo está gastando sus reservas de emergencia y la calidad de tu liderazgo está empezando a sufrir.",
+                recommendation: "Recomendación: Haz una Auditoría de Energía. Delega o elimina esta semana al menos dos tareas que te quiten paz. Agenda el ocio como si fuera una cita con un inversionista: es inamovible."
             },
             {
-                min: 8, max: 13,
-                title: "Alerta Roja (Riesgo de Burnout)",
+                min: 12, max: 16,
+                title: "Riesgo Alto (Burnout Inminente)",
                 color: "text-red-500",
-                description: "Tu bienestar está comprometido. El peso de tu rol está afectando tu salud física y mental. Es urgente hacer una pausa antes de que el agotamiento sea irreversible.",
-                recommendation: "Recomendación: Busca apoyo profesional (terapia o coaching) y considera tomar un descanso real del negocio durante unos días."
+                description: "Diagnóstico: Estás en la zona de colapso. Tu salud y el futuro de tu empresa están en riesgo real. Operar así es como conducir un auto sin aceite: el motor se va a fundir.",
+                recommendation: "Recomendación: Parada Técnica Obligatoria. Necesitas un mínimo de 3 días de desconexión absoluta. Busca un mentor, socio o psicólogo para redistribuir la carga. No es opcional, es una medida de rescate para tu negocio y tu vida."
             }
         ];
 
@@ -289,8 +315,8 @@
 
         // Función auxiliar para renderizar el logo
         const renderLogo = (small = false) => `
-            <div class="text-center ${small ? 'mb-4' : 'mb-2'}">
-                <span class="font-script ${small ? 'text-5xl md:text-6xl' : 'text-7xl md:text-8xl'} text-zenTeal leading-none drop-shadow-sm">Zen</span><span class="font-sans font-bold ${small ? 'text-4xl md:text-5xl' : 'text-6xl md:text-7xl'} text-zenDark leading-none">Prende</span>
+            <div class="flex justify-center ${small ? 'mb-4' : 'mb-2'}">
+                <img src="https://images4.imagebam.com/b2/58/2a/ME1BKPHI_o.png" alt="ZenPrende Logo" class="${small ? 'h-20 md:h-24' : 'h-28 md:h-36'} object-contain drop-shadow-sm">
             </div>
         `;
 
@@ -306,7 +332,7 @@
                     ${renderLogo()}
                     <h2 class="text-base md:text-xl font-semibold text-zenTeal mt-4 uppercase tracking-wide text-center">
                         TEST de Bienestar Emocional<br>
-                        <span class="text-sm md:text-base text-gray-500 normal-case font-normal">para Líderes y Emprendedores</span>
+                        <span class="text-sm md:text-base text-zenTeal normal-case font-medium">para Líderes y Emprendedores</span>
                     </h2>
                     
                     <button onclick="${btnAction}" class="mt-16 bg-zenTeal text-white font-bold text-lg md:text-xl py-4 px-12 rounded-full shadow-lg hover:shadow-xl hover:bg-[#009696] transition-all transform hover:scale-105 active:scale-95">
@@ -327,8 +353,8 @@
             q.options.forEach((opt, idx) => {
                 const isSelected = userAnswers[currentQuestionIndex] === idx;
                 optionsHtml += `
-                    <div onclick="selectOption(${idx})" class="option-card cursor-pointer p-5 rounded-xl mb-4 ${isSelected ? 'selected' : 'bg-gray-50'} shadow-sm hover:shadow-md md:text-lg">
-                        <p class="text-sm md:text-base text-zenDark font-medium leading-relaxed">${opt.text}</p>
+                    <div onclick="selectOption(${idx})" class="option-card relative cursor-pointer p-5 rounded-xl mb-4 ${isSelected ? 'selected' : 'bg-gray-50'} shadow-sm hover:shadow-md md:text-lg">
+                        <p class="text-sm md:text-base text-zenDark font-medium leading-relaxed pr-8">${opt.text}</p>
                     </div>
                 `;
             });
@@ -338,7 +364,7 @@
                     <!-- Header Pequeño (Logo + Progreso) -->
                     <div class="flex justify-between items-center mb-6">
                         <div class="flex items-center">
-                            <span class="font-script text-3xl md:text-4xl text-zenTeal leading-none">Zen</span><span class="font-sans font-bold text-2xl md:text-3xl text-zenDark leading-none">Prende</span>
+                            <img src="https://images4.imagebam.com/b2/58/2a/ME1BKPHI_o.png" alt="ZenPrende Logo" class="h-10 md:h-12 object-contain">
                         </div>
                         <div class="bg-zenTeal text-white text-sm md:text-base font-bold py-1 px-4 rounded-full">
                             ${currentQuestionIndex + 1}/${questions.length}
@@ -355,7 +381,7 @@
                         <h2 class="text-sm md:text-base font-bold text-zenTeal uppercase tracking-wide">
                             TEST de Bienestar Emocional
                         </h2>
-                        <p class="text-xs md:text-sm text-gray-500">para Líderes y Emprendedores</p>
+                        <p class="text-xs md:text-sm text-zenTeal font-medium">para Líderes y Emprendedores</p>
                         <div class="w-24 h-1 bg-zenTeal mx-auto mt-2 rounded-full"></div>
                     </div>
 
@@ -372,7 +398,8 @@
                     <div class="flex ${isFirst ? 'justify-end' : 'justify-between'} mt-auto relative z-20">
                         ${!isFirst ? `<button onclick="prevQuestion()" class="bg-zenDark text-white font-bold py-3 px-8 rounded-full shadow hover:bg-opacity-90 transition md:text-lg">Atrás</button>` : ''}
                         
-                        <button id="btn-next" onclick="${isLast ? 'calculateResults()' : 'nextQuestion()'}" 
+                        <!-- Botón actualizado para disparar el efecto a pantalla completa -->
+                        <button id="btn-next" onclick="handleNextWithEffect(${isLast})" 
                             class="font-bold py-3 px-8 rounded-full shadow transition-all md:text-lg
                             ${userAnswers[currentQuestionIndex] !== null ? 'bg-zenTeal text-white hover:bg-opacity-90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}"
                             ${userAnswers[currentQuestionIndex] !== null ? '' : 'disabled'}>
@@ -487,6 +514,11 @@
             }, 10);
         }
 
+        function closeInstructions() {
+            soundManager.modal();
+            document.getElementById('instructions-modal').classList.add('hidden');
+        }
+
         function startTest() {
             playMusicSafe();
             if (audioCtx.state === 'suspended' && !isMuted) audioCtx.resume();
@@ -541,7 +573,48 @@
             }
         }
 
+        // Nueva función para el efecto de transición con puntos a pantalla completa
+        function handleNextWithEffect(isLast) {
+            if (userAnswers[currentQuestionIndex] === null) return;
+            
+            // 1. Obtener puntos ganados
+            const pts = questions[currentQuestionIndex].options[userAnswers[currentQuestionIndex]].points;
+            
+            // 2. Deshabilitar botón para evitar dobles clics
+            const btnNext = document.getElementById('btn-next');
+            if (btnNext) btnNext.disabled = true;
+
+            // 3. Crear overlay de efecto visual
+            const overlay = document.createElement('div');
+            overlay.className = 'fullscreen-points';
+            // Cambiar color del texto dependiendo de los puntos
+            const textColor = pts === 0 ? '#10b981' : (pts === 1 ? '#f59e0b' : '#ef4444');
+            overlay.innerHTML = `<div class="fullscreen-points-text" style="color: ${textColor}; text-shadow: 0 10px 25px ${textColor}80;">+${pts}</div>`;
+            document.body.appendChild(overlay);
+
+            // 4. Sonido especial de puntuación
+            try {
+                if (audioCtx.state === 'suspended' && !isMuted) audioCtx.resume();
+                playTone(600 + (pts * 200), 'triangle', 0.1, 0.1);
+                setTimeout(() => playTone(800 + (pts * 200), 'sine', 0.2, 0.15), 100);
+            } catch(e){}
+
+            // 5. Avanzar después de la animación
+            setTimeout(() => {
+                if (overlay.parentNode) overlay.remove();
+                
+                if (isLast) {
+                    calculateResults();
+                } else {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                    document.getElementById('app-container').scrollTop = 0;
+                }
+            }, 1050); // Ligeramente más rápido que la animación para una transición fluida
+        }
+
         function nextQuestion() {
+            // Esta función se mantiene por seguridad, pero la navegación real ahora la hace handleNextWithEffect
             if (userAnswers[currentQuestionIndex] !== null) {
                 soundManager.nav();
                 currentQuestionIndex++;
@@ -580,24 +653,28 @@
             soundManager.modal();
             const container = document.getElementById('all-diagnostics-content');
             container.innerHTML = diagnoses.map((d, index) => {
-                // Asignar estilos tipo tarjeta y emojis dependiendo del diagnóstico
-                const bgClass = index === 0 ? 'bg-green-50 border-green-200' : 
-                                index === 1 ? 'bg-yellow-50 border-yellow-200' : 
-                                              'bg-red-50 border-red-200';
-                const icon = index === 0 ? '🌱' : index === 1 ? '⚖️' : '🚨';
+                // Colores vibrantes y marcos sólidos para cada nivel
+                const borderColors = ['border-green-500', 'border-yellow-500', 'border-red-500'];
+                const bgHeaderColors = ['bg-green-500', 'bg-yellow-500', 'bg-red-500'];
+                const textColors = ['text-green-700', 'text-yellow-700', 'text-red-700'];
+                const bgContentColors = ['bg-green-50', 'bg-yellow-50', 'bg-red-50'];
                 
                 return `
-                    <div class="relative overflow-hidden rounded-2xl border-2 ${bgClass} p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">${icon}</span>
-                                <h4 class="font-bold text-lg md:text-xl ${d.color} leading-tight">${d.title}</h4>
-                            </div>
-                            <span class="bg-white text-gray-700 text-xs font-extrabold px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap ml-2 border border-gray-100">
+                    <div class="relative overflow-hidden rounded-2xl border-2 ${borderColors[index]} bg-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1 mb-6">
+                        <!-- Cabecera de color sólido -->
+                        <div class="${bgHeaderColors[index]} text-white px-5 py-3 flex justify-between items-center">
+                            <h4 class="font-bold text-lg md:text-xl tracking-wide">${d.title}</h4>
+                            <span class="bg-white ${textColors[index]} text-xs font-black px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap ml-2">
                                 ${d.min} - ${d.max} pts
                             </span>
                         </div>
-                        <p class="text-sm md:text-base text-gray-600 mt-3">${d.description}</p>
+                        <!-- Contenido con tipografía clara -->
+                        <div class="p-5 ${bgContentColors[index]}">
+                            <p class="text-sm md:text-base text-gray-800 font-semibold mb-3 leading-relaxed">${d.description}</p>
+                            <div class="pt-3 border-t border-black border-opacity-10">
+                                <p class="text-sm md:text-base text-gray-700 font-medium italic">${d.recommendation}</p>
+                            </div>
+                        </div>
                     </div>
                 `;
             }).join('');
