@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>ZenPrende - Test de Bienestar Emocional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Librería para el confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Importamos fuentes similares a las del diseño: Pacifico para "Zen" y Montserrat para el resto -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        zenTeal: '#00A8A8', /* Color cyan/verde principal */
+                        zenDark: '#0B3B4C', /* Color oscuro para texto "Prende" */
+                        zenLight: '#F3FAFA'
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        script: ['Pacifico', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos personalizados para animaciones y scroll */
+        body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Estilo para las opciones seleccionadas */
+        .option-card { transition: all 0.2s; border: 2px solid transparent; }
+        .option-card.selected { border-color: #00A8A8; background-color: rgba(0, 168, 168, 0.05); }
+        .option-card:hover { background-color: rgba(0, 168, 168, 0.02); }
+
+        /* Escondemos la barra de scroll para un look más de app */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        /* Animación para las nuevas espirales: giran juntas para crear efecto 3D de listón */
+        @keyframes spinSpiral { 
+            0% { transform: translateX(0); } 
+            100% { transform: translateX(-50%); } 
+        }
+        .spiral-dark { animation: spinSpiral 12s linear infinite; }
+        .spiral-light { animation: spinSpiral 12s linear infinite; }
+    </style>
+</head>
+<body class="bg-white text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- Controles Superiores (Inicio / Silenciar) -->
+    <div class="fixed top-4 right-4 z-50 flex gap-3 opacity-60 hover:opacity-100 transition-opacity duration-300">
+        <button onclick="goToMenu()" class="bg-zenDark text-white p-2 md:p-3 rounded-full shadow-lg backdrop-blur-md" title="Volver al Menú">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M218.83,103.77l-80-75.48a11.84,11.84,0,0,0-15.66,0l-80,75.48a12,12,0,0,0-3.92,10.79A11.87,11.87,0,0,0,48.54,124H56v84a12,12,0,0,0,12,12H188a12,12,0,0,0,12-12V124h7.46a11.87,11.87,0,0,0,9.29-9.44A12,12,0,0,0,218.83,103.77ZM184,204H152V156a12,12,0,0,0-12-12H116a12,12,0,0,0-12,12v48H72V108.84l56-52.83,56,52.83Z"></path></svg>
+        </button>
+        <button onclick="toggleMute()" id="mute-btn" class="bg-zenDark text-white p-2 md:p-3 rounded-full shadow-lg backdrop-blur-md" title="Silenciar / Activar Sonido">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M152,32V224a8,8,0,0,1-12.71,6.46L68.86,176H32a16,16,0,0,1-16-16V96A16,16,0,0,1,32,80H68.86l70.43-54.46A8,8,0,0,1,152,32Zm36.6,63.17a8,8,0,0,0-11.2,11.45A48.06,48.06,0,0,1,192,128a48,48,0,0,1-14.6,33.37,8,8,0,0,0,11.2,11.45A63.9,63.9,0,0,0,208,128,64.08,64.08,0,0,0,188.6,95.17Zm33.91-23.36a8,8,0,0,0-11,11.64A87.89,87.89,0,0,1,232,128a88.1,88.1,0,0,1-20.49,56.55,8,8,0,0,0,11,11.64A103.88,103.88,0,0,0,248,128,104.14,104.14,0,0,0,222.51,71.81Z"></path></svg>
+        </button>
+    </div>
+
+    <!-- Contenedor Principal Adaptativo 100% -->
+    <div id="app-container" class="w-full h-full relative flex flex-col bg-white overflow-y-auto overflow-x-hidden">
+        
+        <!-- Área de Contenido Dinámico (Centrado y ajustado para grandes pantallas) -->
+        <main id="main-content" class="flex-grow flex flex-col w-full max-w-2xl mx-auto px-6 pt-10 pb-10 relative z-10 fade-in">
+            <!-- El contenido se inyectará aquí vía JS -->
+        </main>
+
+        <!-- Footer fijo en la parte inferior, sin superponerse al contenido -->
+        <footer class="w-full z-0 flex-shrink-0 mt-auto">
+            
+            <!-- Espirales Animadas (Ondas simétricas para bucle infinito sin cortes) -->
+            <div class="relative w-full h-8 md:h-10 overflow-hidden mb-2">
+                <!-- Espiral Oscura (Gruesa y pegada al centro) -->
+                <svg class="absolute top-0 left-0 h-full w-[200%] spiral-dark" viewBox="0 0 200 20" preserveAspectRatio="none">
+                    <path d="M0,10 Q25,8.5 50,10 T100,10 Q125,8.5 150,10 T200,10" stroke="#0B3B4C" stroke-width="6" fill="none" stroke-linecap="round"/>
+                </svg>
+                <!-- Espiral Clara (Delgada, entrelazada y súper pegada a la oscura) -->
+                <svg class="absolute top-0 left-0 h-full w-[200%] spiral-light" viewBox="0 0 200 20" preserveAspectRatio="none">
+                    <path d="M0,10 Q25,11.5 50,10 T100,10 Q125,11.5 150,10 T200,10" stroke="#00A8A8" stroke-width="4" fill="none" stroke-linecap="round"/>
+                </svg>
+            </div>
+            
+            <!-- Zona blanca para textos y logos -->
+            <div class="bg-white pb-8 md:pb-10 px-4 text-center">
+                <p class="text-[10px] md:text-sm text-zenTeal font-semibold mb-3">Proyecto apoyado con recursos del FIDEM</p>
+                <!-- Placeholders de logos como en el diseño -->
+                <div class="flex justify-center items-center gap-3 md:gap-6 opacity-60">
+                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded text-[8px] md:text-xs flex items-center justify-center font-bold">CCDER</div>
+                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
+                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
+                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
+                    <div class="h-5 w-14 md:h-6 md:w-20 bg-gray-300 rounded"></div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Modal de Instrucciones (Oculto por defecto) -->
+        <div id="instructions-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center hidden">
+            <div class="bg-white rounded-3xl p-8 w-11/12 max-w-lg shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
+                <h3 class="text-2xl md:text-3xl font-bold text-zenDark mb-6 text-center">Instrucciones</h3>
+                <p class="text-base md:text-lg text-gray-600 mb-6 text-justify">
+                    Bienvenido a ZenPrende. A continuación se te presentarán 8 situaciones comunes en la vida de un líder o emprendedor.
+                </p>
+                <ul class="text-base md:text-lg text-gray-600 mb-8 list-disc pl-6 space-y-3">
+                    <li>Lee cuidadosamente cada pregunta.</li>
+                    <li>Selecciona la opción con la que más te identifiques actualmente.</li>
+                    <li>No hay respuestas correctas o incorrectas.</li>
+                    <li>Al finalizar, recibirás un diagnóstico sobre tu bienestar emocional.</li>
+                </ul>
+                <button onclick="startTest()" class="w-full bg-zenTeal text-white font-bold text-lg md:text-xl py-4 rounded-full shadow-md hover:bg-opacity-90 transition transform hover:scale-105 active:scale-95">
+                    ¡Comenzar Test!
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal de "Otros Diagnósticos" (Oculto) -->
+        <div id="diagnostics-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center hidden">
+            <div class="bg-white rounded-3xl p-8 w-11/12 max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl md:text-2xl font-bold text-zenDark">Todos los Diagnósticos</h3>
+                    <button onclick="closeDiagnosticsModal()" class="text-gray-500 hover:text-red-500 font-bold text-3xl transition">&times;</button>
+                </div>
+                <div id="all-diagnostics-content" class="space-y-6">
+                    <!-- Se inyecta por JS -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SISTEMA DE SONIDO (WEB AUDIO API) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isMuted = false;
+        
+        // --- MÚSICA DE FONDO ---
+        const bgMusic = new Audio('https://image2url.com/r2/default/audio/1774389168315-3ae04b26-f4be-4356-98f6-79aa63c7529a.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.2; // Volumen suave del 20%
+        
+        function playTone(freq, type, duration, vol) {
+            if (isMuted) return;
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { console.log("Audio no soportado"); }
+        }
+
+        const soundManager = {
+            start: () => { playTone(440, 'sine', 0.1, 0.1); setTimeout(() => playTone(554, 'sine', 0.2, 0.15), 100); },
+            select: () => { playTone(600, 'sine', 0.1, 0.05); },
+            nav: () => { playTone(400, 'triangle', 0.15, 0.05); },
+            modal: () => { playTone(700, 'sine', 0.1, 0.03); },
+            success: () => { 
+                playTone(523.25, 'sine', 0.1, 0.1); 
+                setTimeout(() => playTone(659.25, 'sine', 0.1, 0.1), 100); 
+                setTimeout(() => playTone(783.99, 'sine', 0.4, 0.15), 200); 
+                setTimeout(() => playTone(1046.50, 'sine', 0.6, 0.2), 300); 
+            }
+        };
+
+        // --- BASE DE DATOS DEL TEST ---
+        const questions = [
+            {
+                id: 1,
+                title: "Nivel de energía al despertar",
+                options: [
+                    { text: "a) Me siento descansado y listo para los retos.", points: 3 },
+                    { text: "b) Me toma un café y un rato 'arrancar', pero luego funciono.", points: 2 },
+                    { text: "c) Siento que no dormí nada; el cansancio es físico y mental desde el minuto uno.", points: 1 }
+                ]
+            },
+            {
+                id: 2,
+                title: "Relación con clientes y equipo",
+                options: [
+                    { text: "a) Disfruto la interacción y busco soluciones con empatía.", points: 3 },
+                    { text: "b) A veces me saturan, pero logro mantener la profesionalidad.", points: 2 },
+                    { text: "c) Me siento irritable; cualquier pregunta o error ajeno me genera un rechazo profundo.", points: 1 }
+                ]
+            },
+            {
+                id: 3,
+                title: "Manejo del estrés ante imprevistos",
+                options: [
+                    { text: "a) Mantengo la calma, analizo y actúo de forma estructurada.", points: 3 },
+                    { text: "b) Me genera ansiedad momentánea, pero logro resolverlo sobre la marcha.", points: 2 },
+                    { text: "c) Me paralizo o reacciono de forma impulsiva y frustrada.", points: 1 }
+                ]
+            },
+            {
+                id: 4,
+                title: "Desconexión laboral (Fin de semana/Noches)",
+                options: [
+                    { text: "a) Apago el modo trabajo y disfruto mi tiempo personal plenamente.", points: 3 },
+                    { text: "b) Intento desconectar, pero reviso correos o mensajes esporádicamente.", points: 2 },
+                    { text: "c) Mi mente nunca para; sigo resolviendo problemas de la empresa en mi tiempo libre.", points: 1 }
+                ]
+            },
+            {
+                id: 5,
+                title: "Toma de decisiones importantes",
+                options: [
+                    { text: "a) Decido con claridad y confío en mi criterio y experiencia.", points: 3 },
+                    { text: "b) Dudo un poco y busco validación constante, pero termino decidiendo.", points: 2 },
+                    { text: "c) Postergó las decisiones por miedo a equivocarme o sentir que todo depende de mí.", points: 1 }
+                ]
+            },
+            {
+                id: 6,
+                title: "Reacción ante un fracaso o pérdida en el negocio",
+                options: [
+                    { text: "a) Lo veo como un aprendizaje necesario y pivoto la estrategia.", points: 3 },
+                    { text: "b) Me desmotiva por un tiempo, pero eventualmente me recupero.", points: 2 },
+                    { text: "c) Lo tomo como una derrota personal y me hace dudar de mis capacidades.", points: 1 }
+                ]
+            },
+            {
+                id: 7,
+                title: "Capacidad de delegar tareas",
+                options: [
+                    { text: "a) Confío en mi equipo y les doy autonomía para ejecutar.", points: 3 },
+                    { text: "b) Delego solo lo operativo, pero micro-gestiono las cosas importantes.", points: 2 },
+                    { text: "c) Hago casi todo yo mismo porque siento que nadie más lo hará igual de bien.", points: 1 }
+                ]
+            },
+            {
+                id: 8,
+                title: "Visión a futuro sobre tu emprendimiento",
+                options: [
+                    { text: "a) Me entusiasma el crecimiento y tengo metas claras.", points: 3 },
+                    { text: "b) Veo el futuro con algo de incertidumbre, voy día a día.", points: 2 },
+                    { text: "c) Solo pienso en sobrevivir este mes; el futuro me genera angustia.", points: 1 }
+                ]
+            }
+        ];
+
+        const diagnoses = [
+            {
+                min: 20, max: 24,
+                title: "Líder Zen (Bienestar Óptimo)",
+                color: "text-green-600",
+                description: "¡Felicidades! Tienes un excelente balance emocional. Gestionas tu emprendimiento con inteligencia emocional, lo que te permite ser un líder sostenible. Sigue cultivando tus hábitos de autocuidado.",
+                recommendation: "Recomendación: Comparte tus estrategias de bienestar con tu equipo para fomentar un ambiente de trabajo saludable."
+            },
+            {
+                min: 14, max: 19,
+                title: "Emprendedor en la Cuerda Floja",
+                color: "text-yellow-500",
+                description: "Estás logrando mantener a flote el barco, pero estás gastando mucha energía en el proceso. Hay signos de desgaste que, si no se atienden, podrían llevarte al burnout.",
+                recommendation: "Recomendación: Identifica tareas que puedes delegar de inmediato y establece horarios estrictos de desconexión."
+            },
+            {
+                min: 8, max: 13,
+                title: "Alerta Roja (Riesgo de Burnout)",
+                color: "text-red-500",
+                description: "Tu bienestar está comprometido. El peso de tu rol está afectando tu salud física y mental. Es urgente hacer una pausa antes de que el agotamiento sea irreversible.",
+                recommendation: "Recomendación: Busca apoyo profesional (terapia o coaching) y considera tomar un descanso real del negocio durante unos días."
+            }
+        ];
+
+        // --- ESTADO DE LA APLICACIÓN ---
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null); // Almacena el índice de la opción seleccionada [0, 1 o 2]
+
+        // --- REFERENCIAS DOM ---
+        const mainContent = document.getElementById('main-content');
+        const instructionsModal = document.getElementById('instructions-modal');
+        const modalContent = document.getElementById('modal-content');
+        const diagnosticsModal = document.getElementById('diagnostics-modal');
+
+        // --- FUNCIONES DE RENDERIZADO ---
+
+        // Función auxiliar para renderizar el logo
+        const renderLogo = (small = false) => `
+            <div class="text-center ${small ? 'mb-4' : 'mb-2'}">
+                <span class="font-script ${small ? 'text-5xl md:text-6xl' : 'text-7xl md:text-8xl'} text-zenTeal leading-none drop-shadow-sm">Zen</span><span class="font-sans font-bold ${small ? 'text-4xl md:text-5xl' : 'text-6xl md:text-7xl'} text-zenDark leading-none">Prende</span>
+            </div>
+        `;
+
+        // Vista Inicial (Home)
+        function renderHome() {
+            // Verificamos si ya hay un test activo para cambiar el botón
+            const isTestStarted = userAnswers.some(ans => ans !== null) || currentQuestionIndex > 0;
+            const btnText = isTestStarted ? 'Continuar Test' : 'Iniciar';
+            const btnAction = isTestStarted ? 'resumeTest()' : 'showInstructions()';
+
+            mainContent.innerHTML = `
+                <div class="flex-grow flex flex-col justify-center items-center h-full mt-12 fade-in">
+                    ${renderLogo()}
+                    <h2 class="text-base md:text-xl font-semibold text-zenTeal mt-4 uppercase tracking-wide text-center">
+                        TEST de Bienestar Emocional<br>
+                        <span class="text-sm md:text-base text-gray-500 normal-case font-normal">para Líderes y Emprendedores</span>
+                    </h2>
+                    
+                    <button onclick="${btnAction}" class="mt-16 bg-zenTeal text-white font-bold text-lg md:text-xl py-4 px-12 rounded-full shadow-lg hover:shadow-xl hover:bg-[#009696] transition-all transform hover:scale-105 active:scale-95">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+        }
+
+        // Vista de Preguntas
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            const isFirst = currentQuestionIndex === 0;
+            const isLast = currentQuestionIndex === questions.length - 1;
+            const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+
+            let optionsHtml = '';
+            q.options.forEach((opt, idx) => {
+                const isSelected = userAnswers[currentQuestionIndex] === idx;
+                optionsHtml += `
+                    <div onclick="selectOption(${idx})" class="option-card cursor-pointer p-5 rounded-xl mb-4 ${isSelected ? 'selected' : 'bg-gray-50'} shadow-sm hover:shadow-md md:text-lg">
+                        <p class="text-sm md:text-base text-zenDark font-medium leading-relaxed">${opt.text}</p>
+                    </div>
+                `;
+            });
+
+            mainContent.innerHTML = `
+                <div class="fade-in w-full max-w-xl mx-auto flex flex-col h-full">
+                    <!-- Header Pequeño (Logo + Progreso) -->
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center">
+                            <span class="font-script text-3xl md:text-4xl text-zenTeal leading-none">Zen</span><span class="font-sans font-bold text-2xl md:text-3xl text-zenDark leading-none">Prende</span>
+                        </div>
+                        <div class="bg-zenTeal text-white text-sm md:text-base font-bold py-1 px-4 rounded-full">
+                            ${currentQuestionIndex + 1}/${questions.length}
+                        </div>
+                    </div>
+
+                    <!-- Barra de progreso -->
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+                        <div class="bg-zenTeal h-2 rounded-full transition-all duration-300" style="width: ${progressPercentage}%"></div>
+                    </div>
+
+                    <!-- Subtítulo -->
+                    <div class="text-center mb-8">
+                        <h2 class="text-sm md:text-base font-bold text-zenTeal uppercase tracking-wide">
+                            TEST de Bienestar Emocional
+                        </h2>
+                        <p class="text-xs md:text-sm text-gray-500">para Líderes y Emprendedores</p>
+                        <div class="w-24 h-1 bg-zenTeal mx-auto mt-2 rounded-full"></div>
+                    </div>
+
+                    <!-- Pregunta -->
+                    <h3 class="text-xl md:text-2xl font-bold text-zenDark mb-4">Pregunta ${currentQuestionIndex + 1}</h3>
+                    <h4 class="text-lg md:text-xl font-semibold text-zenTeal mb-8">${q.title}</h4>
+
+                    <!-- Opciones -->
+                    <div class="mb-10 flex-grow">
+                        ${optionsHtml}
+                    </div>
+
+                    <!-- Navegación -->
+                    <div class="flex ${isFirst ? 'justify-end' : 'justify-between'} mt-auto relative z-20">
+                        ${!isFirst ? `<button onclick="prevQuestion()" class="bg-zenDark text-white font-bold py-3 px-8 rounded-full shadow hover:bg-opacity-90 transition md:text-lg">Atrás</button>` : ''}
+                        
+                        <button id="btn-next" onclick="${isLast ? 'calculateResults()' : 'nextQuestion()'}" 
+                            class="font-bold py-3 px-8 rounded-full shadow transition-all md:text-lg
+                            ${userAnswers[currentQuestionIndex] !== null ? 'bg-zenTeal text-white hover:bg-opacity-90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}"
+                            ${userAnswers[currentQuestionIndex] !== null ? '' : 'disabled'}>
+                            ${isLast ? 'Finalizar' : 'Siguiente'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Vista de Resultados
+        function renderResults() {
+            // Calcular puntaje total
+            let totalScore = 0;
+            userAnswers.forEach((answerIndex, qIndex) => {
+                totalScore += questions[qIndex].options[answerIndex].points;
+            });
+
+            // Encontrar diagnóstico
+            const result = diagnoses.find(d => totalScore >= d.min && totalScore <= d.max);
+
+            mainContent.innerHTML = `
+                <div class="fade-in w-full max-w-xl mx-auto flex flex-col items-center mt-8">
+                    ${renderLogo(true)}
+                    
+                    <div class="bg-white border-2 border-zenTeal rounded-3xl p-8 md:p-10 shadow-xl w-full text-center relative z-20 mb-8 mt-4">
+                        <h3 class="text-sm md:text-base font-bold text-gray-500 uppercase mb-3">Tu Resultado</h3>
+                        <div class="text-5xl md:text-6xl font-bold ${result.color} mb-3">${totalScore} <span class="text-xl text-gray-400">pts</span></div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-zenDark mb-4">${result.title}</h2>
+                        <p class="text-base md:text-lg text-gray-600 mb-6">${result.description}</p>
+                        <div class="bg-gray-50 p-4 md:p-6 rounded-xl border border-gray-100">
+                            <p class="text-sm md:text-base font-semibold text-zenDark">${result.recommendation}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 w-full relative z-20">
+                        <button onclick="showDiagnosticsModal()" class="w-full bg-white border-2 border-zenTeal text-zenTeal font-bold py-4 rounded-full hover:bg-zenLight transition md:text-lg">
+                            Ver otros puntajes
+                        </button>
+                        <button onclick="playAgain()" class="w-full bg-zenDark text-white font-bold py-4 rounded-full shadow-lg hover:bg-opacity-90 transition md:text-lg">
+                            Repetir Test
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- LÓGICA E INTERACCIÓN ---
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const muteBtn = document.getElementById('mute-btn');
+            if (isMuted) {
+                muteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M215.39,165.94a8,8,0,0,1-11.31,0L184,145.94l-20.08,20a8,8,0,0,1-11.31-11.31l20-20-20-20.09a8,8,0,0,1,11.31-11.31l20.08,20,20.09-20a8,8,0,0,1,11.31,11.31l-20,20.09,20,20A8,8,0,0,1,215.39,165.94ZM152,32V224a8,8,0,0,1-12.71,6.46L68.86,176H32a16,16,0,0,1-16-16V96A16,16,0,0,1,32,80H68.86l70.43-54.46A8,8,0,0,1,152,32Z"></path></svg>`;
+                bgMusic.pause();
+            } else {
+                muteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M152,32V224a8,8,0,0,1-12.71,6.46L68.86,176H32a16,16,0,0,1-16-16V96A16,16,0,0,1,32,80H68.86l70.43-54.46A8,8,0,0,1,152,32Zm36.6,63.17a8,8,0,0,0-11.2,11.45A48.06,48.06,0,0,1,192,128a48,48,0,0,1-14.6,33.37,8,8,0,0,0,11.2,11.45A63.9,63.9,0,0,0,208,128,64.08,64.08,0,0,0,188.6,95.17Zm33.91-23.36a8,8,0,0,0-11,11.64A87.89,87.89,0,0,1,232,128a88.1,88.1,0,0,1-20.49,56.55,8,8,0,0,0,11,11.64A103.88,103.88,0,0,0,248,128,104.14,104.14,0,0,0,222.51,71.81Z"></path></svg>`;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                bgMusic.play().catch(e => console.log("Esperando interacción para música"));
+            }
+        }
+
+        // Función auxiliar para iniciar la música de forma segura cuando el usuario interactúa
+        function playMusicSafe() {
+            if (!isMuted && bgMusic.paused) {
+                bgMusic.play().catch(e => console.log("Esperando interacción del usuario"));
+            }
+        }
+
+        // --- EFECTOS DE VICTORIA (CONFETI Y VIBRACIÓN) ---
+        function triggerVictoryEffects() {
+            // 1. Hacer vibrar el dispositivo (Patrón: vibra, pausa, vibra)
+            if ("vibrate" in navigator && !isMuted) {
+                navigator.vibrate([200, 100, 300]); 
+            }
+
+            // 2. Lluvia de confeti moderada (solo una explosión elegante)
+            const defaults = { colors: ['#00A8A8', '#22c55e', '#16a34a', '#86efac'], zIndex: 100 };
+            
+            confetti({
+                ...defaults,
+                particleCount: 40,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.6 }
+            });
+            confetti({
+                ...defaults,
+                particleCount: 40,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.6 }
+            });
+        }
+
+        function goToMenu() {
+            playMusicSafe();
+            soundManager.nav();
+            renderHome();
+            document.getElementById('instructions-modal').classList.add('hidden');
+            document.getElementById('diagnostics-modal').classList.add('hidden');
+        }
+
+        function showInstructions() {
+            playMusicSafe();
+            soundManager.modal();
+            instructionsModal.classList.remove('hidden');
+            // Pequeño timeout para la animación de entrada
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function startTest() {
+            playMusicSafe();
+            if (audioCtx.state === 'suspended' && !isMuted) audioCtx.resume();
+            soundManager.start();
+            instructionsModal.classList.add('hidden');
+            modalContent.classList.add('scale-95');
+            modalContent.classList.remove('scale-100');
+            // Reiniciar estado si empezamos de nuevo
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            renderQuestion();
+        }
+
+        function resumeTest() {
+            playMusicSafe();
+            if (audioCtx.state === 'suspended' && !isMuted) audioCtx.resume();
+            soundManager.start();
+            
+            // Si el test ya estaba completamente contestado, ir a resultados directamente
+            if (userAnswers.every(ans => ans !== null) && currentQuestionIndex === questions.length - 1) {
+                calculateResults();
+            } else {
+                renderQuestion(); // Continuar desde la pregunta pendiente
+            }
+        }
+
+        function selectOption(optionIndex) {
+            soundManager.select();
+            userAnswers[currentQuestionIndex] = optionIndex;
+            updateOptionsUI(); // Actualizar el DOM sin re-renderizar para evitar el parpadeo de pantalla
+        }
+
+        function updateOptionsUI() {
+            // 1. Actualizar las clases de las tarjetas de opciones
+            const options = document.querySelectorAll('.option-card');
+            options.forEach((opt, idx) => {
+                if (idx === userAnswers[currentQuestionIndex]) {
+                    opt.classList.add('selected');
+                    opt.classList.remove('bg-gray-50');
+                } else {
+                    opt.classList.remove('selected');
+                    opt.classList.add('bg-gray-50');
+                }
+            });
+
+            // 2. Habilitar el botón Siguiente/Finalizar
+            const nextBtn = document.getElementById('btn-next');
+            if (nextBtn) {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                nextBtn.classList.add('bg-zenTeal', 'text-white', 'hover:bg-opacity-90');
+            }
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestionIndex] !== null) {
+                soundManager.nav();
+                currentQuestionIndex++;
+                renderQuestion();
+                document.getElementById('app-container').scrollTop = 0;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                soundManager.nav();
+                currentQuestionIndex--;
+                renderQuestion();
+                document.getElementById('app-container').scrollTop = 0;
+            }
+        }
+
+        function calculateResults() {
+            soundManager.success();
+            triggerVictoryEffects(); // Disparar confeti y vibración
+            renderResults();
+            document.getElementById('app-container').scrollTop = 0;
+        }
+
+        function playAgain() {
+            playMusicSafe();
+            soundManager.nav();
+            // Solo aquí limpiamos el test al repetirlo intencionalmente
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            renderHome();
+            document.getElementById('app-container').scrollTop = 0;
+        }
+
+        function showDiagnosticsModal() {
+            soundManager.modal();
+            const container = document.getElementById('all-diagnostics-content');
+            container.innerHTML = diagnoses.map((d, index) => {
+                // Asignar estilos tipo tarjeta y emojis dependiendo del diagnóstico
+                const bgClass = index === 0 ? 'bg-green-50 border-green-200' : 
+                                index === 1 ? 'bg-yellow-50 border-yellow-200' : 
+                                              'bg-red-50 border-red-200';
+                const icon = index === 0 ? '🌱' : index === 1 ? '⚖️' : '🚨';
+                
+                return `
+                    <div class="relative overflow-hidden rounded-2xl border-2 ${bgClass} p-5 shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">${icon}</span>
+                                <h4 class="font-bold text-lg md:text-xl ${d.color} leading-tight">${d.title}</h4>
+                            </div>
+                            <span class="bg-white text-gray-700 text-xs font-extrabold px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap ml-2 border border-gray-100">
+                                ${d.min} - ${d.max} pts
+                            </span>
+                        </div>
+                        <p class="text-sm md:text-base text-gray-600 mt-3">${d.description}</p>
+                    </div>
+                `;
+            }).join('');
+            diagnosticsModal.classList.remove('hidden');
+        }
+
+        function closeDiagnosticsModal() {
+            soundManager.modal();
+            diagnosticsModal.classList.add('hidden');
+        }
+
+        // Iniciar la app
+        window.onload = renderHome;
+
+    </script>
+</body>
+</html>
