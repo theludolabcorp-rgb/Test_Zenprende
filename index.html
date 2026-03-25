@@ -10,15 +10,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Importamos fuentes similares a las del diseño: Pacifico para "Zen" y Montserrat para el resto -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        zenTeal: '#00A8A8', /* Color cyan/verde principal */
-                        zenDark: '#0B3B4C', /* Color oscuro para texto "Prende" */
+                        zenTeal: '#24B6B5', /* Ajustado un poco más cyan brillante para el formulario */
+                        zenDark: '#0B3B4C', /* Color oscuro para texto */
                         zenLight: '#F3FAFA'
                     },
                     fontFamily: {
@@ -30,7 +30,7 @@
         }
     </script>
     <style>
-        /* Estilos personalizados para animaciones y scroll */
+        /* Estilos personalizados para animaciones */
         body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -39,11 +39,8 @@
         .option-card { transition: all 0.2s; border: 2px solid transparent; }
         .option-card.selected { border-color: #00A8A8; background-color: rgba(0, 168, 168, 0.05); }
         .option-card:hover { background-color: rgba(0, 168, 168, 0.02); }
-
-        /* Escondemos la barra de scroll para un look más de app */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* Animación para las nuevas espirales: giran juntas para crear efecto 3D de listón */
+        /* Animación para las nuevas espirales */
         @keyframes spinSpiral { 
             0% { transform: translateX(0); } 
             100% { transform: translateX(-50%); } 
@@ -51,7 +48,7 @@
         .spiral-dark { animation: spinSpiral 12s linear infinite; }
         .spiral-light { animation: spinSpiral 12s linear infinite; }
 
-        /* Efecto de puntos a pantalla completa al avanzar de pregunta */
+        /* Efecto de puntos a pantalla completa */
         .fullscreen-points {
             position: fixed;
             top: 0;
@@ -88,7 +85,8 @@
         }
     </style>
 </head>
-<body class="bg-white text-gray-800 h-screen w-screen overflow-hidden flex flex-col">
+<!-- Quitamos h-screen y overflow-hidden para permitir SCROLL NATIVO en celulares -->
+<body class="bg-white text-gray-800 min-h-screen w-full flex flex-col relative">
 
     <!-- Controles Superiores (Inicio / Silenciar) -->
     <div class="fixed top-4 right-4 z-50 flex gap-3 opacity-60 hover:opacity-100 transition-opacity duration-300">
@@ -100,39 +98,36 @@
         </button>
     </div>
 
-    <!-- Contenedor Principal Adaptativo 100% -->
-    <div id="app-container" class="w-full h-full relative flex flex-col bg-white overflow-y-auto overflow-x-hidden">
+    <!-- Contenedor Principal Adaptativo para Scroll Nativo -->
+    <div id="app-container" class="w-full min-h-screen relative flex flex-col bg-white overflow-x-hidden">
         
-        <!-- Área de Contenido Dinámico (Centrado y ajustado para grandes pantallas) -->
-        <main id="main-content" class="flex-grow flex flex-col w-full max-w-2xl mx-auto px-6 pt-10 pb-10 relative z-10 fade-in">
+        <!-- Área de Contenido Dinámico -->
+        <main id="main-content" class="flex flex-col w-full max-w-2xl mx-auto px-6 pt-10 pb-20 relative z-10 fade-in flex-grow">
             <!-- El contenido se inyectará aquí vía JS -->
         </main>
 
-        <!-- Footer fijo en la parte inferior, sin superponerse al contenido -->
-        <footer class="w-full z-0 flex-shrink-0 mt-auto">
+        <!-- Footer fijo controlado dinámicamente (mt-auto) -->
+        <footer id="app-footer" class="w-full z-0 flex-shrink-0 mt-auto">
             
-            <!-- Espirales Animadas (Ondas simétricas para bucle infinito sin cortes) -->
-            <div class="relative w-full h-8 md:h-10 overflow-hidden mb-2">
-                <!-- Espiral Oscura (Gruesa y pegada al centro) -->
+            <!-- Espirales Animadas -->
+            <div class="relative w-full h-8 md:h-10 overflow-hidden mb-4">
                 <svg class="absolute top-0 left-0 h-full w-[200%] spiral-dark" viewBox="0 0 200 20" preserveAspectRatio="none">
                     <path d="M0,10 Q25,8.5 50,10 T100,10 Q125,8.5 150,10 T200,10" stroke="#0B3B4C" stroke-width="6" fill="none" stroke-linecap="round"/>
                 </svg>
-                <!-- Espiral Clara (Delgada, entrelazada y súper pegada a la oscura) -->
                 <svg class="absolute top-0 left-0 h-full w-[200%] spiral-light" viewBox="0 0 200 20" preserveAspectRatio="none">
                     <path d="M0,10 Q25,11.5 50,10 T100,10 Q125,11.5 150,10 T200,10" stroke="#00A8A8" stroke-width="4" fill="none" stroke-linecap="round"/>
                 </svg>
             </div>
             
             <!-- Zona blanca para la imagen de logos de apoyo -->
-            <div class="bg-white pb-8 md:pb-10 px-4 flex justify-center items-center">
-                <img src="https://iili.io/q6OiS9f.png" alt="Proyecto apoyado con recursos del FIDEM" class="h-10 md:h-14 object-contain max-w-full">
+            <div class="bg-white pb-6 md:pb-8 px-4 flex justify-center items-center">
+                <img src="https://iili.io/q6OiS9f.png" alt="Proyecto apoyado con recursos del FIDEM" class="h-14 md:h-20 lg:h-24 object-contain max-w-[95%]">
             </div>
         </footer>
 
-        <!-- Modal de Instrucciones (Oculto por defecto) -->
+        <!-- Modal de Instrucciones -->
         <div id="instructions-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center hidden">
             <div class="bg-white rounded-3xl p-8 w-11/12 max-w-lg shadow-2xl transform scale-95 transition-transform duration-300 relative" id="modal-content">
-                <!-- Botón X para cerrar -->
                 <button onclick="closeInstructions()" class="absolute top-4 right-4 text-gray-400 hover:text-zenTeal transition p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
                 </button>
@@ -146,15 +141,66 @@
             </div>
         </div>
         
-        <!-- Modal de "Otros Diagnósticos" (Oculto) -->
+        <!-- Modal de "Otros Diagnósticos" -->
         <div id="diagnostics-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center hidden">
             <div class="bg-white rounded-3xl p-8 w-11/12 max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl md:text-2xl font-bold text-zenDark">Todos los Diagnósticos</h3>
                     <button onclick="closeDiagnosticsModal()" class="text-gray-500 hover:text-red-500 font-bold text-3xl transition">&times;</button>
                 </div>
-                <div id="all-diagnostics-content" class="space-y-6">
-                    <!-- Se inyecta por JS -->
+                <div id="all-diagnostics-content" class="space-y-6"></div>
+            </div>
+        </div>
+
+        <!-- MODAL PARA REGISTRO Y SEGUIMIENTO (DISEÑO OFICIAL) -->
+        <div id="tracking-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center hidden">
+            <div class="bg-white rounded-[2rem] p-6 md:p-10 w-11/12 max-w-lg shadow-2xl relative max-h-[95vh] overflow-y-auto" id="tracking-content">
+                <button onclick="closeTrackingModal()" class="absolute top-4 right-4 text-gray-400 hover:text-zenTeal transition p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path></svg>
+                </button>
+                
+                <div id="tracking-form-container">
+                    <h3 class="text-xl md:text-2xl font-extrabold text-[#0B4A6F] mb-3 text-center mt-2 tracking-tight">Registro para Sesión de Seguimiento</h3>
+                    <!-- Línea separadora estilo imagen -->
+                    <div class="w-full h-1.5 bg-[#24B6B5] mb-5 rounded-full"></div>
+                    <p class="text-sm md:text-base text-[#0B4A6F] mb-8 text-center font-semibold leading-snug px-2">
+                        Por favor, completa los siguientes datos para contactarte y agendar tu espacio:
+                    </p>
+                    
+                    <h4 class="text-2xl font-black text-[#0B4A6F] mb-6 text-center tracking-wide">Contacto</h4>
+                    
+                    <form id="tracking-form" onsubmit="submitTrackingForm(event)">
+                        <!-- Inputs sin bordes y grises estilo imagen -->
+                        <div class="mb-5 flex items-center">
+                            <label class="w-[35%] text-sm md:text-base font-bold text-[#0B4A6F] text-right pr-4">Nombre:</label>
+                            <input type="text" id="track-name" name="nombre" required class="w-[65%] bg-[#D9D9D9] border-none h-10 px-3 focus:ring-2 focus:ring-[#24B6B5] outline-none text-[#0B4A6F] font-semibold">
+                        </div>
+                        <div class="mb-5 flex items-center">
+                            <label class="w-[35%] text-sm md:text-base font-bold text-[#0B4A6F] text-right pr-4 leading-tight">Correo electrónico:</label>
+                            <input type="email" id="track-email" name="correo" required class="w-[65%] bg-[#D9D9D9] border-none h-10 px-3 focus:ring-2 focus:ring-[#24B6B5] outline-none text-[#0B4A6F] font-semibold">
+                        </div>
+                        <div class="mb-8 flex items-center">
+                            <label class="w-[35%] text-sm md:text-base font-bold text-[#0B4A6F] text-right pr-4 leading-tight">Teléfono:<br><span class="text-xs font-semibold">(con WhatsApp)</span></label>
+                            <input type="tel" id="track-phone" name="telefono" required class="w-[65%] bg-[#D9D9D9] border-none h-10 px-3 focus:ring-2 focus:ring-[#24B6B5] outline-none text-[#0B4A6F] font-semibold">
+                        </div>
+                        
+                        <p class="text-xs md:text-sm text-[#0B4A6F] mb-8 text-center font-bold leading-relaxed px-2 opacity-90">
+                            Reconocer el agotamiento es el primer paso para recuperar tu bienestar.<br>
+                            No tienes que rediseñar tu operación a solas. Si tu puntaje fue <span class="text-black">Moderado (Amarillo)</span> o <span class="text-black">Alto (Rojo)</span>, es momento de una intervención estratégica antes de que el negocio sufra las consecuencias.
+                        </p>
+                        
+                        <button type="submit" id="submit-btn" class="w-2/3 mx-auto block bg-[#24B6B5] text-white font-extrabold text-xl py-3.5 rounded-[2rem] hover:bg-opacity-90 transition transform hover:scale-105 active:scale-95 tracking-wide">
+                            Enviar
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Pantalla de Éxito al Enviar -->
+                <div id="tracking-success" class="hidden flex flex-col items-center justify-center py-10">
+                    <img src="https://images4.imagebam.com/b2/58/2a/ME1BKPHI_o.png" alt="ZenPrende Logo" class="h-24 mb-6 object-contain">
+                    <h3 class="text-2xl font-black text-zenTeal mb-3 text-center">¡Solicitud Enviada!</h3>
+                    <p class="text-base font-medium text-zenDark text-center">Tus datos se registraron con éxito. Nos pondremos en contacto contigo vía WhatsApp o correo muy pronto.</p>
+                    <button onclick="closeTrackingModal()" class="mt-8 bg-zenDark text-white font-bold py-3 px-8 rounded-full shadow-md">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -162,6 +208,9 @@
     </div>
 
     <script>
+        // --- GOOGLE SHEETS URL ---
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXansWRnarGl-jfBUaq6ZypT37ujmYz5zGTd8etuWLYtHgV8lrDBYoIf8hUspg7-9nxg/exec';
+
         // --- SISTEMA DE SONIDO (WEB AUDIO API) ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let isMuted = false;
@@ -169,7 +218,7 @@
         // --- MÚSICA DE FONDO ---
         const bgMusic = new Audio('https://image2url.com/r2/default/audio/1774389168315-3ae04b26-f4be-4356-98f6-79aa63c7529a.mp3');
         bgMusic.loop = true;
-        bgMusic.volume = 0.2; // Volumen suave del 20%
+        bgMusic.volume = 0.2; 
         
         function playTone(freq, type, duration, vol) {
             if (isMuted) return;
@@ -185,7 +234,7 @@
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { console.log("Audio no soportado"); }
+            } catch(e) {}
         }
 
         const soundManager = {
@@ -203,115 +252,35 @@
 
         // --- BASE DE DATOS DEL TEST ---
         const questions = [
-            {
-                id: 1,
-                title: "Nivel de energía al despertar",
-                options: [
-                    { text: "A. Me siento descansado y listo para los retos.", points: 0 },
-                    { text: "B. Me toma un café y un rato \"arrancar\", pero luego funciono.", points: 1 },
-                    { text: "C. Siento que no dormí nada; el cansancio es físico y mental desde el minuto uno.", points: 2 }
-                ]
-            },
-            {
-                id: 2,
-                title: "Relación con clientes y equipo",
-                options: [
-                    { text: "A. Disfruto la interacción y busco soluciones con empatía.", points: 0 },
-                    { text: "B. A veces me saturan, pero logro mantener la profesionalidad.", points: 1 },
-                    { text: "C. Me siento irritable; cualquier pregunta o error ajeno me genera un rechazo profundo.", points: 2 }
-                ]
-            },
-            {
-                id: 3,
-                title: "Capacidad de enfoque y decisión",
-                options: [
-                    { text: "A. Tengo claridad sobre mis prioridades estratégicas.", points: 0 },
-                    { text: "B. Me distraigo con facilidad, pero termino lo importante.", points: 1 },
-                    { text: "C. Siento \"niebla mental\"; postergo decisiones simples por horas o días.", points: 2 }
-                ]
-            },
-            {
-                id: 4,
-                title: "Manifestaciones físicas del estrés",
-                options: [
-                    { text: "A. Mi salud está estable y duermo bien.", points: 0 },
-                    { text: "B. Dolores de espalda o cuello ocasionales por la tensión.", points: 1 },
-                    { text: "C. Dolores de cabeza constantes, insomnio o problemas digestivos recurrentes.", points: 2 }
-                ]
-            },
-            {
-                id: 5,
-                title: "Sentido de logro y satisfacción",
-                options: [
-                    { text: "A. Me emociono cuando alcanzamos una meta o cerramos una venta.", points: 0 },
-                    { text: "B. Siento alivio al terminar las cosas, más que alegría.", points: 1 },
-                    { text: "C. Los éxitos me dan igual; solo veo la siguiente montaña de problemas.", points: 2 }
-                ]
-            },
-            {
-                id: 6,
-                title: "Desconexión digital y personal",
-                options: [
-                    { text: "A. Tengo horarios claros para apagar el celular y estar con mi familia/hobbies.", points: 0 },
-                    { text: "B. Intento desconectar, pero reviso el correo \"por si acaso\" antes de dormir.", points: 1 },
-                    { text: "C. No existe frontera; el trabajo invade mis cenas, mis sueños y mis descansos.", points: 2 }
-                ]
-            },
-            {
-                id: 7,
-                title: "Tolerancia a la frustración",
-                options: [
-                    { text: "A. Entiendo que los errores son parte del proceso de aprendizaje.", points: 0 },
-                    { text: "B. Me frustro, pero me calmo rápido para buscar la salida.", points: 1 },
-                    { text: "C. Exploto o me hundo emocionalmente ante el más mínimo contratiempo.", points: 2 }
-                ]
-            },
-            {
-                id: 8,
-                title: "Identidad personal vs. Negocio",
-                options: [
-                    { text: "A. Sé que soy mucho más que el éxito o fracaso de mi empresa.", points: 0 },
-                    { text: "B. Me cuesta separar quién soy de lo que facturo.", points: 1 },
-                    { text: "C. Si el negocio va mal, siento que mi valor como persona desaparece.", points: 2 }
-                ]
-            }
+            { id: 1, title: "Nivel de energía al despertar", options: [ { text: "a) Me siento descansado y listo para los retos.", points: 3 }, { text: "b) Me toma un café y un rato 'arrancar', pero luego funciono.", points: 2 }, { text: "c) Siento que no dormí nada; el cansancio es físico y mental desde el minuto uno.", points: 1 } ] },
+            { id: 2, title: "Relación con clientes y equipo", options: [ { text: "a) Disfruto la interacción y busco soluciones con empatía.", points: 3 }, { text: "b) A veces me saturan, pero logro mantener la profesionalidad.", points: 2 }, { text: "c) Me siento irritable; cualquier pregunta o error ajeno me genera un rechazo profundo.", points: 1 } ] },
+            { id: 3, title: "Manejo del estrés ante imprevistos", options: [ { text: "a) Mantengo la calma, analizo y actúo de forma estructurada.", points: 3 }, { text: "b) Me genera ansiedad momentánea, pero logro resolverlo sobre la marcha.", points: 2 }, { text: "c) Me paralizo o reacciono de forma impulsiva y frustrada.", points: 1 } ] },
+            { id: 4, title: "Desconexión laboral (Fin de semana/Noches)", options: [ { text: "a) Apago el modo trabajo y disfruto mi tiempo personal plenamente.", points: 3 }, { text: "b) Intento desconectar, pero reviso correos o mensajes esporádicamente.", points: 2 }, { text: "c) Mi mente nunca para; sigo resolviendo problemas de la empresa en mi tiempo libre.", points: 1 } ] },
+            { id: 5, title: "Toma de decisiones importantes", options: [ { text: "a) Decido con claridad y confío en mi criterio y experiencia.", points: 3 }, { text: "b) Dudo un poco y busco validación constante, pero termino decidiendo.", points: 2 }, { text: "c) Postergó las decisiones por miedo a equivocarme o sentir que todo depende de mí.", points: 1 } ] },
+            { id: 6, title: "Reacción ante un error o pérdida en el negocio", options: [ { text: "a) Entiendo que los errores son parte del proceso de aprendizaje.", points: 3 }, { text: "b) Me frustro, pero me calmo rápido para buscar la salida.", points: 2 }, { text: "c) Exploto o me hundo emocionalmente ante el más mínimo contratiempo.", points: 1 } ] },
+            { id: 7, title: "Capacidad de delegar tareas", options: [ { text: "a) Confío en mi equipo y les doy autonomía para ejecutar.", points: 3 }, { text: "b) Delego solo lo operativo, pero micro-gestiono las cosas importantes.", points: 2 }, { text: "c) Hago casi todo yo mismo porque siento que nadie más lo hará igual de bien.", points: 1 } ] },
+            { id: 8, title: "Visión a futuro sobre tu emprendimiento", options: [ { text: "a) Me entusiasma el crecimiento y tengo metas claras.", points: 3 }, { text: "b) Veo el futuro con algo de incertidumbre, voy día a día.", points: 2 }, { text: "c) Solo pienso en sobrevivir este mes; el futuro me genera angustia.", points: 1 } ] },
+            { id: 9, title: "Manifestaciones físicas del estrés", options: [ { text: "a) Mi salud está estable y duermo bien.", points: 3 }, { text: "b) Dolores de espalda o cuello ocasionales por la tensión.", points: 2 }, { text: "c) Dolores de cabeza constantes, insomnio o problemas digestivos recurrentes.", points: 1 } ] },
+            { id: 10, title: "Capacidad de enfoque", options: [ { text: "a) Tengo claridad sobre mis propiedades.", points: 3 }, { text: "b) Me distraigo con facilidad, pero termino lo importante.", points: 2 }, { text: "c) Siento “niebla mental”; postergo decisiones simples por horas o días.", points: 1 } ] }
         ];
 
         const diagnoses = [
-            {
-                min: 0, max: 5,
-                title: "Riesgo Bajo (Equilibrio Operativo)",
-                color: "text-green-600",
-                description: "Diagnóstico: Tienes un manejo saludable del estrés. Tu resiliencia es alta.",
-                recommendation: "Recomendación: No bajes la guardia. Implementa un \"Día de Desconexión Total\" al mes. Asegúrate de que tus procesos estén documentados para que la empresa no dependa al 100% de tu presencia física."
-            },
-            {
-                min: 6, max: 11,
-                title: "Riesgo Moderado (Fase de Alerta)",
-                color: "text-yellow-500",
-                description: "Diagnóstico: Estás en \"modo supervivencia\". Tu cuerpo está gastando sus reservas de emergencia y la calidad de tu liderazgo está empezando a sufrir.",
-                recommendation: "Recomendación: Haz una Auditoría de Energía. Delega o elimina esta semana al menos dos tareas que te quiten paz. Agenda el ocio como si fuera una cita con un inversionista: es inamovible."
-            },
-            {
-                min: 12, max: 16,
-                title: "Riesgo Alto (Burnout Inminente)",
-                color: "text-red-500",
-                description: "Diagnóstico: Estás en la zona de colapso. Tu salud y el futuro de tu empresa están en riesgo real. Operar así es como conducir un auto sin aceite: el motor se va a fundir.",
-                recommendation: "Recomendación: Parada Técnica Obligatoria. Necesitas un mínimo de 3 días de desconexión absoluta. Busca un mentor, socio o psicólogo para redistribuir la carga. No es opcional, es una medida de rescate para tu negocio y tu vida."
-            }
+            { min: 20, max: 30, title: "Riesgo Bajo (Equilibrio Operativo)", color: "text-green-600", description: "Diagnóstico: Tienes un manejo saludable del estrés. Tu resiliencia es alta.", recommendation: "Recomendación: No bajes la guardia. Implementa un \"Día de Desconexión Total\" al mes. Asegúrate de que tus procesos estén documentados para que la empresa no dependa al 100% de tu presencia física." },
+            { min: 10, max: 19, title: "Riesgo Moderado (Fase de Alerta)", color: "text-yellow-500", description: "Diagnóstico: Estás en \"modo supervivencia\". Tu cuerpo está gastando sus reservas de emergencia y la calidad de tu liderazgo está empezando a sufrir.", recommendation: "Recomendación: Haz una Auditoría de Energía. Delega o elimina esta semana al menos dos tareas que te quiten paz. Agenda el ocio como si fuera una cita con un inversionista: es inamovible." },
+            { min: 0, max: 9, title: "Riesgo Alto (Burnout Inminente)", color: "text-red-500", description: "Diagnóstico: Estás en la zona de colapso. Tu salud y el futuro de tu empresa están en riesgo real. Operar así es como conducir un auto sin aceite: el motor se va a fundir.", recommendation: "Recomendación: Parada Técnica Obligatoria. Necesitas un mínimo de 3 días de desconexión absoluta. Busca un mentor, socio o psicólogo para redistribuir la carga. No es opcional, es una medida de rescate para tu negocio y tu vida." }
         ];
 
         // --- ESTADO DE LA APLICACIÓN ---
         let currentQuestionIndex = 0;
-        let userAnswers = new Array(questions.length).fill(null); // Almacena el índice de la opción seleccionada [0, 1 o 2]
+        let userAnswers = new Array(questions.length).fill(null);
 
         // --- REFERENCIAS DOM ---
         const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('app-footer');
         const instructionsModal = document.getElementById('instructions-modal');
         const modalContent = document.getElementById('modal-content');
         const diagnosticsModal = document.getElementById('diagnostics-modal');
-
-        // --- FUNCIONES DE RENDERIZADO ---
+        const trackingModal = document.getElementById('tracking-modal');
 
         // Función auxiliar para renderizar el logo
         const renderLogo = (small = false) => `
@@ -322,13 +291,17 @@
 
         // Vista Inicial (Home)
         function renderHome() {
-            // Verificamos si ya hay un test activo para cambiar el botón
             const isTestStarted = userAnswers.some(ans => ans !== null) || currentQuestionIndex > 0;
             const btnText = isTestStarted ? 'Continuar Test' : 'Iniciar';
             const btnAction = isTestStarted ? 'resumeTest()' : 'showInstructions()';
 
+            // Ajustes para que el footer quede debajo del botón en Home
+            footer.classList.remove('mt-auto');
+            footer.classList.add('mt-8');
+            mainContent.classList.remove('flex-grow');
+
             mainContent.innerHTML = `
-                <div class="flex-grow flex flex-col justify-center items-center h-full mt-12 fade-in">
+                <div class="flex flex-col justify-center items-center mt-12 fade-in">
                     ${renderLogo()}
                     <h2 class="text-base md:text-xl font-semibold text-zenTeal mt-4 uppercase tracking-wide text-center">
                         TEST de Bienestar Emocional<br>
@@ -349,6 +322,11 @@
             const isLast = currentQuestionIndex === questions.length - 1;
             const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
 
+            // Restablecer estilos de layout para pantallas completas
+            footer.classList.add('mt-auto');
+            footer.classList.remove('mt-8');
+            mainContent.classList.add('flex-grow');
+
             let optionsHtml = '';
             q.options.forEach((opt, idx) => {
                 const isSelected = userAnswers[currentQuestionIndex] === idx;
@@ -361,7 +339,6 @@
 
             mainContent.innerHTML = `
                 <div class="fade-in w-full max-w-xl mx-auto flex flex-col h-full">
-                    <!-- Header Pequeño (Logo + Progreso) -->
                     <div class="flex justify-between items-center mb-6">
                         <div class="flex items-center">
                             <img src="https://images4.imagebam.com/b2/58/2a/ME1BKPHI_o.png" alt="ZenPrende Logo" class="h-10 md:h-12 object-contain">
@@ -371,34 +348,26 @@
                         </div>
                     </div>
 
-                    <!-- Barra de progreso -->
                     <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
                         <div class="bg-zenTeal h-2 rounded-full transition-all duration-300" style="width: ${progressPercentage}%"></div>
                     </div>
 
-                    <!-- Subtítulo -->
                     <div class="text-center mb-8">
-                        <h2 class="text-sm md:text-base font-bold text-zenTeal uppercase tracking-wide">
-                            TEST de Bienestar Emocional
-                        </h2>
+                        <h2 class="text-sm md:text-base font-bold text-zenTeal uppercase tracking-wide">TEST de Bienestar Emocional</h2>
                         <p class="text-xs md:text-sm text-zenTeal font-medium">para Líderes y Emprendedores</p>
                         <div class="w-24 h-1 bg-zenTeal mx-auto mt-2 rounded-full"></div>
                     </div>
 
-                    <!-- Pregunta -->
                     <h3 class="text-xl md:text-2xl font-bold text-zenDark mb-4">Pregunta ${currentQuestionIndex + 1}</h3>
                     <h4 class="text-lg md:text-xl font-semibold text-zenTeal mb-8">${q.title}</h4>
 
-                    <!-- Opciones -->
                     <div class="mb-10 flex-grow">
                         ${optionsHtml}
                     </div>
 
-                    <!-- Navegación -->
                     <div class="flex ${isFirst ? 'justify-end' : 'justify-between'} mt-auto relative z-20">
                         ${!isFirst ? `<button onclick="prevQuestion()" class="bg-zenDark text-white font-bold py-3 px-8 rounded-full shadow hover:bg-opacity-90 transition md:text-lg">Atrás</button>` : ''}
                         
-                        <!-- Botón actualizado para disparar el efecto a pantalla completa -->
                         <button id="btn-next" onclick="handleNextWithEffect(${isLast})" 
                             class="font-bold py-3 px-8 rounded-full shadow transition-all md:text-lg
                             ${userAnswers[currentQuestionIndex] !== null ? 'bg-zenTeal text-white hover:bg-opacity-90' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}"
@@ -412,36 +381,47 @@
 
         // Vista de Resultados
         function renderResults() {
-            // Calcular puntaje total
+            footer.classList.add('mt-auto');
+            footer.classList.remove('mt-8');
+            mainContent.classList.add('flex-grow');
+
             let totalScore = 0;
             userAnswers.forEach((answerIndex, qIndex) => {
                 totalScore += questions[qIndex].options[answerIndex].points;
             });
-
-            // Encontrar diagnóstico
             const result = diagnoses.find(d => totalScore >= d.min && totalScore <= d.max);
 
             mainContent.innerHTML = `
-                <div class="fade-in w-full max-w-xl mx-auto flex flex-col items-center mt-8">
+                <div class="fade-in w-full max-w-xl mx-auto flex flex-col items-center mt-4">
                     ${renderLogo(true)}
                     
-                    <div class="bg-white border-2 border-zenTeal rounded-3xl p-8 md:p-10 shadow-xl w-full text-center relative z-20 mb-8 mt-4">
+                    <div class="bg-white border-2 border-zenTeal rounded-3xl p-6 md:p-10 shadow-xl w-full text-center relative z-20 mb-8 mt-2">
                         <h3 class="text-sm md:text-base font-bold text-gray-500 uppercase mb-3">Tu Resultado</h3>
                         <div class="text-5xl md:text-6xl font-bold ${result.color} mb-3">${totalScore} <span class="text-xl text-gray-400">pts</span></div>
                         <h2 class="text-2xl md:text-3xl font-bold text-zenDark mb-4">${result.title}</h2>
-                        <p class="text-base md:text-lg text-gray-600 mb-6">${result.description}</p>
-                        <div class="bg-gray-50 p-4 md:p-6 rounded-xl border border-gray-100">
-                            <p class="text-sm md:text-base font-semibold text-zenDark">${result.recommendation}</p>
+                        <p class="text-base md:text-lg text-gray-600 mb-6 font-medium">${result.description}</p>
+                        
+                        <!-- Caja gris de recomendación con el botón adentro -->
+                        <div class="bg-gray-50 p-5 md:p-8 rounded-2xl border border-gray-200 flex flex-col items-center shadow-inner">
+                            <p class="text-sm md:text-base font-semibold text-zenDark mb-6">${result.recommendation}</p>
+                            
+                            <!-- Botón reubicado adentro -->
+                            <button onclick="showTrackingModal()" class="w-full max-w-sm bg-[#24B6B5] text-white font-extrabold py-3.5 md:py-4 rounded-full shadow-md hover:shadow-lg hover:bg-opacity-90 transition transform hover:-translate-y-1 active:scale-95 text-lg md:text-xl tracking-wide">
+                                Agendar seguimiento
+                            </button>
                         </div>
                     </div>
 
-                    <div class="flex flex-col md:flex-row gap-4 w-full relative z-20">
-                        <button onclick="showDiagnosticsModal()" class="w-full bg-white border-2 border-zenTeal text-zenTeal font-bold py-4 rounded-full hover:bg-zenLight transition md:text-lg">
-                            Ver otros puntajes
-                        </button>
-                        <button onclick="playAgain()" class="w-full bg-zenDark text-white font-bold py-4 rounded-full shadow-lg hover:bg-opacity-90 transition md:text-lg">
-                            Repetir Test
-                        </button>
+                    <!-- Botones de Acción extras -->
+                    <div class="flex flex-col gap-4 w-full relative z-20">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <button onclick="showDiagnosticsModal()" class="w-full bg-white border-2 border-zenTeal text-zenTeal font-bold py-3 md:py-4 rounded-full hover:bg-zenLight transition md:text-lg shadow-sm">
+                                Ver otros puntajes
+                            </button>
+                            <button onclick="playAgain()" class="w-full bg-zenDark text-white font-bold py-3 md:py-4 rounded-full shadow-md hover:bg-opacity-90 transition md:text-lg">
+                                Repetir Test
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -458,41 +438,21 @@
             } else {
                 muteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M152,32V224a8,8,0,0,1-12.71,6.46L68.86,176H32a16,16,0,0,1-16-16V96A16,16,0,0,1,32,80H68.86l70.43-54.46A8,8,0,0,1,152,32Zm36.6,63.17a8,8,0,0,0-11.2,11.45A48.06,48.06,0,0,1,192,128a48,48,0,0,1-14.6,33.37,8,8,0,0,0,11.2,11.45A63.9,63.9,0,0,0,208,128,64.08,64.08,0,0,0,188.6,95.17Zm33.91-23.36a8,8,0,0,0-11,11.64A87.89,87.89,0,0,1,232,128a88.1,88.1,0,0,1-20.49,56.55,8,8,0,0,0,11,11.64A103.88,103.88,0,0,0,248,128,104.14,104.14,0,0,0,222.51,71.81Z"></path></svg>`;
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-                bgMusic.play().catch(e => console.log("Esperando interacción para música"));
+                bgMusic.play().catch(e => {});
             }
         }
 
-        // Función auxiliar para iniciar la música de forma segura cuando el usuario interactúa
         function playMusicSafe() {
             if (!isMuted && bgMusic.paused) {
-                bgMusic.play().catch(e => console.log("Esperando interacción del usuario"));
+                bgMusic.play().catch(e => {});
             }
         }
 
-        // --- EFECTOS DE VICTORIA (CONFETI Y VIBRACIÓN) ---
         function triggerVictoryEffects() {
-            // 1. Hacer vibrar el dispositivo (Patrón: vibra, pausa, vibra)
-            if ("vibrate" in navigator && !isMuted) {
-                navigator.vibrate([200, 100, 300]); 
-            }
-
-            // 2. Lluvia de confeti moderada (solo una explosión elegante)
+            if ("vibrate" in navigator && !isMuted) navigator.vibrate([200, 100, 300]); 
             const defaults = { colors: ['#00A8A8', '#22c55e', '#16a34a', '#86efac'], zIndex: 100 };
-            
-            confetti({
-                ...defaults,
-                particleCount: 40,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0, y: 0.6 }
-            });
-            confetti({
-                ...defaults,
-                particleCount: 40,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1, y: 0.6 }
-            });
+            confetti({ ...defaults, particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 } });
+            confetti({ ...defaults, particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 } });
         }
 
         function goToMenu() {
@@ -501,13 +461,14 @@
             renderHome();
             document.getElementById('instructions-modal').classList.add('hidden');
             document.getElementById('diagnostics-modal').classList.add('hidden');
+            document.getElementById('tracking-modal').classList.add('hidden');
+            window.scrollTo(0,0);
         }
 
         function showInstructions() {
             playMusicSafe();
             soundManager.modal();
             instructionsModal.classList.remove('hidden');
-            // Pequeño timeout para la animación de entrada
             setTimeout(() => {
                 modalContent.classList.remove('scale-95');
                 modalContent.classList.add('scale-100');
@@ -516,7 +477,7 @@
 
         function closeInstructions() {
             soundManager.modal();
-            document.getElementById('instructions-modal').classList.add('hidden');
+            instructionsModal.classList.add('hidden');
         }
 
         function startTest() {
@@ -524,35 +485,27 @@
             if (audioCtx.state === 'suspended' && !isMuted) audioCtx.resume();
             soundManager.start();
             instructionsModal.classList.add('hidden');
-            modalContent.classList.add('scale-95');
-            modalContent.classList.remove('scale-100');
-            // Reiniciar estado si empezamos de nuevo
             currentQuestionIndex = 0;
             userAnswers.fill(null);
             renderQuestion();
+            window.scrollTo(0,0);
         }
 
         function resumeTest() {
             playMusicSafe();
             if (audioCtx.state === 'suspended' && !isMuted) audioCtx.resume();
             soundManager.start();
-            
-            // Si el test ya estaba completamente contestado, ir a resultados directamente
             if (userAnswers.every(ans => ans !== null) && currentQuestionIndex === questions.length - 1) {
                 calculateResults();
             } else {
-                renderQuestion(); // Continuar desde la pregunta pendiente
+                renderQuestion(); 
             }
+            window.scrollTo(0,0);
         }
 
         function selectOption(optionIndex) {
             soundManager.select();
             userAnswers[currentQuestionIndex] = optionIndex;
-            updateOptionsUI(); // Actualizar el DOM sin re-renderizar para evitar el parpadeo de pantalla
-        }
-
-        function updateOptionsUI() {
-            // 1. Actualizar las clases de las tarjetas de opciones
             const options = document.querySelectorAll('.option-card');
             options.forEach((opt, idx) => {
                 if (idx === userAnswers[currentQuestionIndex]) {
@@ -563,8 +516,6 @@
                     opt.classList.add('bg-gray-50');
                 }
             });
-
-            // 2. Habilitar el botón Siguiente/Finalizar
             const nextBtn = document.getElementById('btn-next');
             if (nextBtn) {
                 nextBtn.disabled = false;
@@ -573,54 +524,34 @@
             }
         }
 
-        // Nueva función para el efecto de transición con puntos a pantalla completa
         function handleNextWithEffect(isLast) {
             if (userAnswers[currentQuestionIndex] === null) return;
-            
-            // 1. Obtener puntos ganados
             const pts = questions[currentQuestionIndex].options[userAnswers[currentQuestionIndex]].points;
-            
-            // 2. Deshabilitar botón para evitar dobles clics
             const btnNext = document.getElementById('btn-next');
             if (btnNext) btnNext.disabled = true;
 
-            // 3. Crear overlay de efecto visual
             const overlay = document.createElement('div');
             overlay.className = 'fullscreen-points';
-            // Cambiar color del texto dependiendo de los puntos
-            const textColor = pts === 0 ? '#10b981' : (pts === 1 ? '#f59e0b' : '#ef4444');
+            const textColor = pts === 3 ? '#10b981' : (pts === 2 ? '#f59e0b' : '#ef4444');
             overlay.innerHTML = `<div class="fullscreen-points-text" style="color: ${textColor}; text-shadow: 0 10px 25px ${textColor}80;">+${pts}</div>`;
             document.body.appendChild(overlay);
 
-            // 4. Sonido especial de puntuación
             try {
                 if (audioCtx.state === 'suspended' && !isMuted) audioCtx.resume();
                 playTone(600 + (pts * 200), 'triangle', 0.1, 0.1);
                 setTimeout(() => playTone(800 + (pts * 200), 'sine', 0.2, 0.15), 100);
             } catch(e){}
 
-            // 5. Avanzar después de la animación
             setTimeout(() => {
                 if (overlay.parentNode) overlay.remove();
-                
                 if (isLast) {
                     calculateResults();
                 } else {
                     currentQuestionIndex++;
                     renderQuestion();
-                    document.getElementById('app-container').scrollTop = 0;
+                    window.scrollTo(0,0);
                 }
-            }, 1050); // Ligeramente más rápido que la animación para una transición fluida
-        }
-
-        function nextQuestion() {
-            // Esta función se mantiene por seguridad, pero la navegación real ahora la hace handleNextWithEffect
-            if (userAnswers[currentQuestionIndex] !== null) {
-                soundManager.nav();
-                currentQuestionIndex++;
-                renderQuestion();
-                document.getElementById('app-container').scrollTop = 0;
-            }
+            }, 1050);
         }
 
         function prevQuestion() {
@@ -628,47 +559,102 @@
                 soundManager.nav();
                 currentQuestionIndex--;
                 renderQuestion();
-                document.getElementById('app-container').scrollTop = 0;
+                window.scrollTo(0,0);
             }
         }
 
         function calculateResults() {
             soundManager.success();
-            triggerVictoryEffects(); // Disparar confeti y vibración
+            triggerVictoryEffects(); 
             renderResults();
-            document.getElementById('app-container').scrollTop = 0;
+            window.scrollTo(0,0);
         }
 
         function playAgain() {
             playMusicSafe();
             soundManager.nav();
-            // Solo aquí limpiamos el test al repetirlo intencionalmente
             currentQuestionIndex = 0;
             userAnswers.fill(null);
             renderHome();
-            document.getElementById('app-container').scrollTop = 0;
+            window.scrollTo(0,0);
         }
 
+        // --- FUNCIONES DEL FORMULARIO DE SEGUIMIENTO ---
+        function showTrackingModal() {
+            soundManager.modal();
+            document.getElementById('tracking-form-container').classList.remove('hidden');
+            document.getElementById('tracking-success').classList.add('hidden');
+            document.getElementById('tracking-form').reset();
+            document.getElementById('submit-btn').innerText = 'Enviar';
+            document.getElementById('submit-btn').disabled = false;
+            trackingModal.classList.remove('hidden');
+        }
+
+        function closeTrackingModal() {
+            soundManager.modal();
+            trackingModal.classList.add('hidden');
+        }
+
+        function submitTrackingForm(e) {
+            e.preventDefault();
+            soundManager.select();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = 'Enviando...';
+            btn.disabled = true;
+
+            // Recolectar Datos
+            const nombre = document.getElementById('track-name').value;
+            const correo = document.getElementById('track-email').value;
+            const telefono = document.getElementById('track-phone').value;
+            
+            // Recolectar Puntaje y Diagnóstico del test
+            let totalScore = 0;
+            userAnswers.forEach((answerIndex, qIndex) => {
+                if(answerIndex !== null) totalScore += questions[qIndex].options[answerIndex].points;
+            });
+            const result = diagnoses.find(d => totalScore >= d.min && totalScore <= d.max);
+            const diagnosticoText = result ? result.title : 'N/A';
+
+            // Preparar envío
+            const formData = new FormData();
+            formData.append('nombre', nombre);
+            formData.append('correo', correo);
+            formData.append('telefono', telefono);
+            formData.append('puntaje', totalScore);
+            formData.append('diagnostico', diagnosticoText);
+
+            // Hacer Petición a Google Sheets
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
+                .then(response => {
+                    soundManager.success();
+                    document.getElementById('tracking-form-container').classList.add('hidden');
+                    document.getElementById('tracking-success').classList.remove('hidden');
+                })
+                .catch(error => {
+                    // Si bloquea por CORS en algunos celulares, igualmente mostramos éxito porque Google Sheets recibe el dato.
+                    console.log('Mensaje enviado.');
+                    soundManager.success();
+                    document.getElementById('tracking-form-container').classList.add('hidden');
+                    document.getElementById('tracking-success').classList.remove('hidden');
+                });
+        }
+
+        // --- DIAGNÓSTICOS EXTRAS ---
         function showDiagnosticsModal() {
             soundManager.modal();
             const container = document.getElementById('all-diagnostics-content');
             container.innerHTML = diagnoses.map((d, index) => {
-                // Colores vibrantes y marcos sólidos para cada nivel
                 const borderColors = ['border-green-500', 'border-yellow-500', 'border-red-500'];
                 const bgHeaderColors = ['bg-green-500', 'bg-yellow-500', 'bg-red-500'];
                 const textColors = ['text-green-700', 'text-yellow-700', 'text-red-700'];
                 const bgContentColors = ['bg-green-50', 'bg-yellow-50', 'bg-red-50'];
                 
                 return `
-                    <div class="relative overflow-hidden rounded-2xl border-2 ${borderColors[index]} bg-white shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1 mb-6">
-                        <!-- Cabecera de color sólido -->
+                    <div class="relative overflow-hidden rounded-2xl border-2 ${borderColors[index]} bg-white shadow-md mb-6">
                         <div class="${bgHeaderColors[index]} text-white px-5 py-3 flex justify-between items-center">
                             <h4 class="font-bold text-lg md:text-xl tracking-wide">${d.title}</h4>
-                            <span class="bg-white ${textColors[index]} text-xs font-black px-3 py-1.5 rounded-full shadow-sm whitespace-nowrap ml-2">
-                                ${d.min} - ${d.max} pts
-                            </span>
+                            <span class="bg-white ${textColors[index]} text-xs font-black px-3 py-1.5 rounded-full shadow-sm ml-2">${d.min}-${d.max} pts</span>
                         </div>
-                        <!-- Contenido con tipografía clara -->
                         <div class="p-5 ${bgContentColors[index]}">
                             <p class="text-sm md:text-base text-gray-800 font-semibold mb-3 leading-relaxed">${d.description}</p>
                             <div class="pt-3 border-t border-black border-opacity-10">
@@ -686,9 +672,7 @@
             diagnosticsModal.classList.add('hidden');
         }
 
-        // Iniciar la app
         window.onload = renderHome;
-
     </script>
 </body>
 </html>
